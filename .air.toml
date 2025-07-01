@@ -1,44 +1,9 @@
-# Config file for Air (https://github.com/cosmtrek/air)
-# See https://github.com/cosmtrek/air#configuration for all options
+root = "."
+testdata_dir = "testdata"
+tmp_dir = "tmp"
 
 [build]
-  # Working directory
-  # . means current directory
-  # You can change this to your main package directory if needed
-  cmd = "go build -o ./.air/main ./cmd/tx-disguise"
-  bin = "./.air/main"
-  full_bin = ""
-  include_dir = ["cmd", "internal"]
-  include_ext = [".go", ".yaml"]
-  exclude_dir = ["tmp", "vendor"]
-  exclude_file = []
-  exclude_regex = []
-  follow_symlink = false
-  delay = 1000 # ms
-  stop_on_error = false
-
-[log]
-  time = true
-
-[color]
-  main = "yellow"
-  watcher = "cyan"
-  build = "green"
-  runner = "magenta"
-
-[debug]
-  enable = true
-  force = false
-
-[misc]
-  clean_on_exit = true
-
-[screen]
-  clear_on_rebuild = false
-  keep_scroll = true
-
-[run]
-  cmd = "./tmp/main"
-  # If you want to run in a specific working directory, set it here
-  # dir = "."
-
+  cmd = "go build -o ./tmp/main ./cmd/tx-disguise"
+  bin = "./tmp/main"
+  include_ext = [".go"]
+  poll = true

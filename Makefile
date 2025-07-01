@@ -17,7 +17,7 @@ $(GOLANGCI_LINT_BIN):
 
 .PHONY: dev
 dev: $(AIR_BIN)
-	$(AIR_BIN) -c .air.toml
+	$(AIR_BIN) -c ./.air.toml
 
 .PHONY: lint
 lint: $(GOLANGCI_LINT_BIN)

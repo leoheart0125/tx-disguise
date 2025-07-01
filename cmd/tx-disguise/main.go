@@ -77,7 +77,7 @@ func main() {
 			time.Now().Format("01/02 15:04:05"),
 			futureService.GetCurrentFuturePrice(),
 			futureService.GetCurrentActualPrice(),
-			"",
+			"test",
 		)
 		time.Sleep(futureService.RequestInterval)
 	}
