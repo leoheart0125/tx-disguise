@@ -3,10 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
 	"time"
 
-	future "tx-disguise/internal/txdisguise"
+	future "tx-disguise/internal/future"
 )
 
 var (
@@ -59,31 +58,27 @@ func main() {
 		showVersion()
 		return
 	}
+	futureService := future.NewService(futuresCode)
 	if yFlag {
-		future.FuturesCode = "MXF"
+		futureService.FuturesCode = "MXF"
 	}
 	if zFlag {
-		future.FuturesCode = "TMF"
+		futureService.FuturesCode = "TMF"
 	}
 	isForcedClearScreen = rFlag
 
 	showVersion()
 	fmt.Println()
-	futQuote := future.FutureGetCurrentQuote()
-	if futQuote != nil {
-		fmt.Fprintf(os.Stderr, "%s (%s)\n", futQuote.DispCName, future.MarketSessionNow())
-	}
 	fmt.Println()
 	fmt.Printf("%s %-11s %-21s | %-21s %s\n\n", "date", "", "Futures", "Actuals", "trash")
 
 	for {
-		future.ClearScreen(isForcedClearScreen)
 		fmt.Printf("[%s] %-21s | %-21s %s\n",
 			time.Now().Format("01/02 15:04:05"),
-			future.SelfGetPrice(future.FutureGetCurrentQuote()),
-			future.SelfGetPrice(future.ActualsGetCurrentQuote()),
-			future.FakeInfo(),
+			futureService.GetCurrentFuturePrice(),
+			futureService.GetCurrentActualPrice(),
+			"",
 		)
-		time.Sleep(future.RequestInterval)
+		time.Sleep(futureService.RequestInterval)
 	}
 }
