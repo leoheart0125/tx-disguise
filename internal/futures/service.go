@@ -1,4 +1,4 @@
-package future
+package futures
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 )
 
 type IService interface {
-	GetCurrentFuturePrice() string
+	GetCurrentFuturesPrice() string
 	GetCurrentActualPrice() string
 }
 
@@ -20,6 +20,8 @@ type Service struct {
 	RequestInterval time.Duration
 	httpClient      *http.Client
 }
+
+var _ IService = (*Service)(nil)
 
 func NewService(futuresCode string) *Service {
 	return &Service{
@@ -54,7 +56,7 @@ func (s *Service) apiRequest(symbolID string) (*Quote, error) {
 	return &data.RtData, nil
 }
 
-func (s *Service) GetCurrentFuturePrice() string {
+func (s *Service) GetCurrentFuturesPrice() string {
 	session := MarketSessionNow()
 	var symbolID string
 	contractCode := FuturesCurrentContractCode()

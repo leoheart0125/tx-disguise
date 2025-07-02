@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	future "tx-disguise/internal/future"
+	"tx-disguise/internal/futures"
 	"tx-disguise/internal/tui"
 )
 
@@ -49,14 +49,14 @@ func main() {
 		showVersion()
 		return
 	}
-	futureService := future.NewService(defaultFuturesCode)
+	futuresService := futures.NewService(defaultFuturesCode)
 	if yFlag {
-		futureService.FuturesCode = "MXF"
+		futuresService.FuturesCode = "MXF"
 	}
 	if zFlag {
-		futureService.FuturesCode = "TMF"
+		futuresService.FuturesCode = "TMF"
 	}
-	view := tui.NewProgram(futureService)
+	view := tui.NewProgram(futuresService)
 	if _, err := view.Run(); err != nil {
 		fmt.Printf("Error running TUI: %v\n", err)
 		return

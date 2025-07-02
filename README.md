@@ -50,7 +50,7 @@ make lint
 
 ## Project Structure
 - `cmd/tx-disguise/main.go` — Entry point
-- `internal/future/` — Futures logic, API, and utils
+- `internal/futures/` — Futures logic, API, and utils
 - `internal/tui/` — Terminal UI (Bubble Tea)
 - `config/config.yaml` — Config file (reserved for future use)
 - `Makefile` — Dev and lint tasks

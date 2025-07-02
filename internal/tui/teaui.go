@@ -6,21 +6,21 @@ import (
 	"os/exec"
 	"strings"
 	"time"
-	"tx-disguise/internal/future"
+	"tx-disguise/internal/futures"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/x/term"
 )
 
 type model struct {
-	futureService future.IService
-	fakeInfo      []string
-	futures       string
+	futuresService futures.IService
+	fakeInfo       []string
+	futures        string
 }
 
 type (
 	fakeInfoMsg []string
-	futureMsg   string
+	futuresMsg  string
 )
 
 func genFakeInfoMsg() []string {
@@ -50,18 +50,18 @@ func (m model) fakeInfoTicker() tea.Cmd {
 	})
 }
 
-func (m model) futureTicker() tea.Cmd {
+func (m model) futuresTicker() tea.Cmd {
 	return tea.Tick(2*time.Second, func(t time.Time) tea.Msg {
-		return futureMsg(fmt.Sprintf("[%s] %-21s | %-21s \n",
+		return futuresMsg(fmt.Sprintf("[%s] %-21s | %-21s \n",
 			time.Now().Format("01/02 15:04:05"),
-			m.futureService.GetCurrentFuturePrice(),
-			m.futureService.GetCurrentActualPrice(),
+			m.futuresService.GetCurrentFuturesPrice(),
+			m.futuresService.GetCurrentActualPrice(),
 		))
 	})
 }
 
 func (m model) Init() tea.Cmd {
-	return tea.Batch(m.fakeInfoTicker(), m.futureTicker())
+	return tea.Batch(m.fakeInfoTicker(), m.futuresTicker())
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -70,9 +70,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.fakeInfo = msg
 		return m, m.fakeInfoTicker()
 
-	case futureMsg:
+	case futuresMsg:
 		m.futures = string(msg)
-		return m, m.futureTicker()
+		return m, m.futuresTicker()
 
 	case tea.KeyMsg:
 		if msg.String() == "q" {
@@ -100,10 +100,10 @@ func (m model) View() string {
 	return fmt.Sprintf("%s\n%s\n[q] quit", fakeBlock, priceLine)
 }
 
-func NewProgram(futureService future.IService) *tea.Program {
+func NewProgram(futuresService futures.IService) *tea.Program {
 	m := model{
-		futureService: futureService,
-		fakeInfo:      []string{},
+		futuresService: futuresService,
+		fakeInfo:       []string{},
 		futures: fmt.Sprintf("[%s] %-21s | %-21s \n",
 			time.Now().Format("01/02 15:04:05"),
 			"-",

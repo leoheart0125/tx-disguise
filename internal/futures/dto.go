@@ -1,4 +1,4 @@
-package future
+package futures
 
 type Quote struct {
 	Quote struct {
