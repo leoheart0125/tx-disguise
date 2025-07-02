@@ -45,8 +45,8 @@ func (s *Service) apiRequest(symbolID string) (*Quote, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
+	_ = resp.Body.Close()
 	var data RtData
 	if err := json.Unmarshal(body, &data); err != nil {
 		return nil, err

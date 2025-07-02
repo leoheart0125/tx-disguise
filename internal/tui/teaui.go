@@ -2,19 +2,20 @@ package tui
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
 	"tx-disguise/internal/future"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/x/term"
 )
 
 type model struct {
 	futureService future.IService
 	fakeInfo      []string
 	futures       string
-	termHeight    int
 }
 
 type (
@@ -22,14 +23,30 @@ type (
 	futureMsg   string
 )
 
-func (m model) fakeInfoTicker() tea.Cmd {
-	return tea.Tick(2*time.Second, func(t time.Time) tea.Msg {
-		out, err := exec.Command("top", "-status", "pid,command,cpu,mem", "-l", "1", "-n", "50").Output()
-		if err != nil {
-			return []string{"[ERROR] " + err.Error()}
+func genFakeInfoMsg() []string {
+	out, err := exec.Command("top", "-stats", "pid,command,cpu,mem", "-l", "2", "-n", "50", "-o", "cpu").Output()
+	if err != nil {
+		return []string{"[ERROR] " + err.Error()}
+	}
+	lines := strings.Split(string(out), "\n")
+	headerIdx := -1
+	header := "Processes:"
+	for i, line := range lines {
+		if strings.HasPrefix(line, header) {
+			if headerIdx == -1 {
+				headerIdx = i
+				continue
+			} else {
+				return lines[i-1:]
+			}
 		}
-		lines := strings.Split(string(out), "\n")
-		return fakeInfoMsg(lines)
+	}
+	return lines
+}
+
+func (m model) fakeInfoTicker() tea.Cmd {
+	return tea.Tick(500*time.Millisecond, func(t time.Time) tea.Msg {
+		return fakeInfoMsg(genFakeInfoMsg())
 	})
 }
 
@@ -49,11 +66,6 @@ func (m model) Init() tea.Cmd {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-
-	case tea.WindowSizeMsg:
-		fmt.Println("got WindowSizeMsg", msg.Height)
-		m.termHeight = msg.Height
-
 	case fakeInfoMsg:
 		m.fakeInfo = msg
 		return m, m.fakeInfoTicker()
@@ -72,28 +84,31 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	// 保留底部 2 行（divider + futures）
-	m.termHeight = 30 // Default height for testing, replace with actual terminal height in production
-	visibleTopLines := m.termHeight - 3
-	if visibleTopLines < 0 {
-		visibleTopLines = 0
+	// Get terminal size
+	// TODO: width will be used in future updates, default to 80
+	_, height, err := term.GetSize(os.Stdout.Fd())
+	if err != nil || height <= 0 {
+		height = 24 // Default terminal size
 	}
-	if visibleTopLines > len(m.fakeInfo) {
-		visibleTopLines = len(m.fakeInfo)
+	if len(m.fakeInfo) == 0 {
+		m.fakeInfo = genFakeInfoMsg()
 	}
-
+	visibleTopLines := max(height-3, 0)
 	fakeBlock := strings.Join(m.fakeInfo[:visibleTopLines], "\n")
-	priceLine := fmt.Sprintf("%s %-11s %-21s | %-21s \n\n%s", "date", "", "Futures", "Actuals", m.futures)
-	divider := strings.Repeat("-", len(priceLine))
+	priceLine := fmt.Sprintf("%s %-11s %-21s | %-21s \n%s", "date", "", "Futures", "Actuals", m.futures)
 
-	return fmt.Sprintf("%s\n%s\n%s\n[q] quit", fakeBlock, divider, priceLine)
+	return fmt.Sprintf("%s\n%s\n[q] quit", fakeBlock, priceLine)
 }
 
 func NewProgram(futureService future.IService) *tea.Program {
 	m := model{
 		futureService: futureService,
 		fakeInfo:      []string{},
-		futures:       "",
+		futures: fmt.Sprintf("[%s] %-21s | %-21s \n",
+			time.Now().Format("01/02 15:04:05"),
+			"-",
+			"-",
+		),
 	}
 	return tea.NewProgram(m, tea.WithAltScreen(), tea.WithInputTTY())
 }

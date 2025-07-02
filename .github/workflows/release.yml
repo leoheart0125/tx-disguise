@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+            go-version-file: go.mod
+
+      - name: Build for linux/arm64
+        run: |
+          mkdir -p tmp
+          GOOS=linux GOARCH=arm64 go build -o ./tmp/txd ./cmd/tx-disguise
+
+      - name: Get tag and repo name
+        id: vars
+        run: |
+          echo "tag=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+          echo "repo=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_OUTPUT
+
+      - name: Package binary as tar.gz
+        run: |
+          cd tmp
+          tar -czvf tx-disguise-${{ steps.vars.outputs.tag }}-arm64.tar.gz txd
+          cd ..
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./tmp/tx-disguise-${{ steps.vars.outputs.tag }}-arm64.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
