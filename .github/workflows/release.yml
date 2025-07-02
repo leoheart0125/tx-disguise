@@ -20,10 +20,10 @@ jobs:
         with:
             go-version-file: go.mod
 
-      - name: Build for linux/arm64
+      - name: Build for darwin/arm64
         run: |
           mkdir -p tmp
-          GOOS=linux GOARCH=arm64 go build -o ./tmp/txd ./cmd/tx-disguise
+          GOOS=darwin GOARCH=arm64 go build -o ./tmp/txd ./cmd/tx-disguise
 
       - name: Get tag and repo name
         id: vars
