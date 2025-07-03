@@ -2,18 +2,21 @@ package futures
 
 import (
 	"fmt"
-	"os"
+	"strconv"
 	"strings"
 	"time"
 )
 
 func ParseInt(s string) int {
+	// avoid parsing errors from empty strings or non-numeric values
+	if s == "" {
+		return 0
+	}
 	if i := strings.Index(s, "."); i >= 0 {
 		s = s[:i]
 	}
-	var v int
-	if _, err := fmt.Sscanf(s, "%d", &v); err != nil {
-		fmt.Fprintf(os.Stderr, "Error parsing integer from string '%s': %v\n", s, err)
+	v, err := strconv.Atoi(s)
+	if err != nil {
 		return 0
 	}
 	return v
