@@ -38,15 +38,19 @@ Example:
 ### Prerequisites
 - Go 1.24+
 
-### Run in Dev Mode (with hot reload)
+### Run in Dev Mode
+
 ```
-make dev
+make dev-tui
 ```
+This runs the TUI directly with `go run ./cmd/tx-disguise`.
 
 ### Lint
+
 ```
 make lint
 ```
+This will auto-install `golangci-lint` if not present, then run formatting and lint checks.
 
 ## Project Structure
 - `cmd/tx-disguise/main.go` — Entry point
