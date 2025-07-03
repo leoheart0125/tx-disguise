@@ -15,9 +15,13 @@ $(AIR_BIN):
 $(GOLANGCI_LINT_BIN):
 	@go install $(GOLANGCI_LINT_PKG)
 
-.PHONY: dev
-dev: $(AIR_BIN)
-	$(AIR_BIN) -c ./.air.toml
+# .PHONY: dev
+# dev: $(AIR_BIN)
+# 	$(AIR_BIN) -c ./.air.toml
+
+.PHONY: dev-tui
+dev-tui:
+	go run ./cmd/tx-disguise
 
 .PHONY: lint
 lint: $(GOLANGCI_LINT_BIN)
