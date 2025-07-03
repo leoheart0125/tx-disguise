@@ -9,18 +9,18 @@ import (
 )
 
 const defaultFuturesCode = "TXF"
-const version = "beta-0.1.1"
+const version = "v0.2.0-beta"
 
 func usage() {
 	fmt.Println(`
-	Usage: tx-disguise [-v] [-h] [ -y | -z ]
+	Usage: txd [-v] [-h] [ -y | -z ]
 		-v: show version  
 		-h: show this help
 	Symbol Options:
 		-y: 小台 (MXF)  
 		-z: 微台 (TMF)
 	Example: 
-		tx-disguise -y
+		txd -y
 	`)
 }
 
