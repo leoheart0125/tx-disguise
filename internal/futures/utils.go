@@ -25,6 +25,10 @@ func ParseInt(s string) int {
 func FuturesIsThisMonthSettled() bool {
 	now := time.Now()
 	year, month, day := now.Date()
+	if MarketSessionNow() != "regular" {
+		nextDay := now.AddDate(0, 0, 1)
+		year, month, day = nextDay.Date()
+	}
 	firstOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, now.Location())
 	weekdayOf1st := int(firstOfMonth.Weekday())
 	dateOfFirstWednesday := (11 - weekdayOf1st) % 7
@@ -37,12 +41,11 @@ func FuturesCurrentContractCode() string {
 	year, month, _ := now.Date()
 	deltaMonth := 0
 	if month == 12 {
-		monthHex := 0x76
 		if FuturesIsThisMonthSettled() {
 			year++
-			monthHex = 0x65
+			month = 1
 		}
-		return fmt.Sprintf("%c%d", monthHex, year%10)
+		return fmt.Sprintf("%c%d", month, year%10)
 	}
 	if FuturesIsThisMonthSettled() {
 		deltaMonth = 1
