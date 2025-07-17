@@ -25,29 +25,30 @@ func ParseInt(s string) int {
 func FuturesIsThisMonthSettled() bool {
 	now := time.Now()
 	year, month, day := now.Date()
-	if MarketSessionNow() != "regular" {
-		nextDay := now.AddDate(0, 0, 1)
-		year, month, day = nextDay.Date()
-	}
+	nowMinutes := now.Hour()*60 + now.Minute()
 	firstOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, now.Location())
 	weekdayOf1st := int(firstOfMonth.Weekday())
 	dateOfFirstWednesday := (11 - weekdayOf1st) % 7
 	settleDay := dateOfFirstWednesday + 14
-	return day > settleDay
+	if day == settleDay && (nowMinutes <= 825) {
+		return false
+	}
+	return day > settleDay || (day == settleDay && nowMinutes > 825)
 }
 
 func FuturesCurrentContractCode() string {
 	now := time.Now()
 	year, month, _ := now.Date()
 	deltaMonth := 0
+	isMonthSettled := FuturesIsThisMonthSettled()
 	if month == 12 {
-		if FuturesIsThisMonthSettled() {
+		if isMonthSettled {
 			year++
 			month = 1
 		}
 		return fmt.Sprintf("%c%d", month, year%10)
 	}
-	if FuturesIsThisMonthSettled() {
+	if isMonthSettled {
 		deltaMonth = 1
 	}
 	monthHex := 64 + int(month) + deltaMonth
