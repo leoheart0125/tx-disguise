@@ -22,8 +22,7 @@ func ParseInt(s string) int {
 	return v
 }
 
-func FuturesIsThisMonthSettled() bool {
-	now := time.Now()
+func FuturesIsThisMonthSettledAt(now time.Time) bool {
 	year, month, day := now.Date()
 	nowMinutes := now.Hour()*60 + now.Minute()
 	firstOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, now.Location())
@@ -36,11 +35,14 @@ func FuturesIsThisMonthSettled() bool {
 	return day > settleDay || (day == settleDay && nowMinutes > 825)
 }
 
-func FuturesCurrentContractCode() string {
-	now := time.Now()
+func FuturesIsThisMonthSettled() bool {
+	return FuturesIsThisMonthSettledAt(time.Now())
+}
+
+func FuturesCurrentContractCodeAt(now time.Time) string {
 	year, month, _ := now.Date()
 	deltaMonth := 0
-	isMonthSettled := FuturesIsThisMonthSettled()
+	isMonthSettled := FuturesIsThisMonthSettledAt(now)
 	if month == 12 {
 		if isMonthSettled {
 			year++
@@ -53,6 +55,10 @@ func FuturesCurrentContractCode() string {
 	}
 	monthHex := 64 + int(month) + deltaMonth
 	return fmt.Sprintf("%c%d", monthHex, year%10)
+}
+
+func FuturesCurrentContractCode() string {
+	return FuturesCurrentContractCodeAt(time.Now())
 }
 
 func ParseQuote(q *Quote) string {
@@ -68,8 +74,7 @@ func ParseQuote(q *Quote) string {
 	return fmt.Sprintf("%d %s (%d, %d)", lastPrice, diffStr, lastPrice-lowPrice, highPrice-lastPrice)
 }
 
-func MarketSessionNow() string {
-	now := time.Now()
+func MarketSessionAt(now time.Time) string {
 	nowMinutes := now.Hour()*60 + now.Minute()
 	if nowMinutes >= 525 && nowMinutes <= 825 {
 		return "regular"
@@ -78,4 +83,8 @@ func MarketSessionNow() string {
 		return "electronic"
 	}
 	return "closed"
+}
+
+func MarketSessionNow() string {
+	return MarketSessionAt(time.Now())
 }
