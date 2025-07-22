@@ -9,7 +9,7 @@ import (
 )
 
 const defaultFuturesCode = "TXF"
-const version = "v0.2.0-beta"
+const version = "v0.1.0"
 
 func usage() {
 	fmt.Println(`
