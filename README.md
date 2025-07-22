@@ -1,3 +1,4 @@
+[繁體中文](README.zh.md)
 # tx-disguise
 
 A terminal-based tool for disguising trading activity by displaying fake system information alongside real-time Taiwan Futures Exchange (TAIFEX) futures and actuals prices. Built with Go and Bubble Tea TUI framework.
@@ -6,7 +7,6 @@ A terminal-based tool for disguising trading activity by displaying fake system 
 - **Terminal UI**: Shows live system process info (from `top`) and real-time futures/actuals prices.
 - **Futures Support**: Supports 小台 (MXF), 微台 (TMF), and default TXF contracts.
 - **Configurable**: Uses a simple YAML config (currently empty, for future use).
-- **Hot reload**: Supports live development with [air](https://github.com/air-verse/air).
 - **Linting**: Integrated with golangci-lint for code quality.
 - **Release Workflow**: GitHub Actions workflow for building and releasing Darwin/arm64 (Apple Silicon) binaries.
 
@@ -32,6 +32,20 @@ Example:
   ```sh
   ./txd [flags]
   ```
+
+### Terminal UI Usage
+
+When you run `txd`, you'll see a terminal interface with two main views:
+
+- **System Info View**: Displays fake system process info (from `top`) and current futures/actuals prices.
+- **History View**: Shows a scrollable history of futures/actuals prices over the past hour.
+
+**Controls:**
+- `[q]` Quit the program
+- `[tab]` Switch between System Info and History views
+- `[up/down]` Scroll through history (in History view)
+
+The UI updates system info every 0.5 seconds, futures prices every 2 seconds, and appends to history every minute.
 
 ## Development
 
