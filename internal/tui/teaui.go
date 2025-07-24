@@ -3,9 +3,9 @@ package tui
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 	"time"
+	"tx-disguise/internal/fakeinfo"
 	"tx-disguise/internal/futures"
 	"tx-disguise/internal/shared"
 
@@ -14,13 +14,14 @@ import (
 )
 
 type model struct {
-	futuresService futures.IService
-	fakeInfo       []string
-	futures        string
-	futuresHistory *shared.RingBuffer[string]
-	height         int
-	currentTab     int // 0: fakeInfo, 1: futuresHistory
-	historyScroll  int // scroll position for futuresHistory
+	futuresService  futures.IService
+	fakeInfoService fakeinfo.IService
+	fakeInfo        []string
+	futures         string
+	futuresHistory  *shared.RingBuffer[string]
+	height          int
+	currentTab      int // 0: fakeInfo, 1: futuresHistory
+	historyScroll   int // scroll position for futuresHistory
 }
 
 type (
@@ -29,30 +30,13 @@ type (
 	futuresHistoryMsg *shared.RingBuffer[string]
 )
 
-func genFakeInfoMsg() []string {
-	out, err := exec.Command("top", "-stats", "pid,command,cpu,mem", "-l", "2", "-n", "50", "-o", "cpu").Output()
-	if err != nil {
-		return []string{"[ERROR] " + err.Error()}
-	}
-	lines := strings.Split(string(out), "\n")
-	headerIdx := -1
-	header := "Processes:"
-	for i, line := range lines {
-		if strings.HasPrefix(line, header) {
-			if headerIdx == -1 {
-				headerIdx = i
-				continue
-			} else {
-				return lines[i:]
-			}
-		}
-	}
-	return lines
-}
-
 func (m model) fakeInfoTicker() tea.Cmd {
-	return tea.Tick(500*time.Millisecond, func(t time.Time) tea.Msg {
-		return fakeInfoMsg(genFakeInfoMsg())
+	return tea.Tick(2*time.Second, func(t time.Time) tea.Msg {
+		fakeInfo, err := m.fakeInfoService.GetFakeInfo()
+		if err != nil {
+			return fakeInfoMsg([]string{"[ERROR] " + err.Error()})
+		}
+		return fakeInfoMsg(fakeInfo)
 	})
 }
 
@@ -120,7 +104,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	if m.currentTab == 0 {
 		if len(m.fakeInfo) == 0 {
-			m.fakeInfo = genFakeInfoMsg()
+			m.fakeInfo, _ = m.fakeInfoService.GetFakeInfo()
 		}
 		visibleTopLines := max(m.height-3, 0)
 		fakeBlock := strings.Join(m.fakeInfo[:visibleTopLines], "\n")
@@ -153,16 +137,18 @@ func (m model) View() string {
 	return fmt.Sprintf("%s\n%s\n%s\n%s\n\n[q] quit, [tab] switch, [up/down] scroll", header, strings.Join(lines, "\n"), "Current:", m.futures)
 }
 
-func NewProgram(futuresService futures.IService) *tea.Program {
+func NewProgram(futuresService futures.IService, fakeInfoService fakeinfo.IService) *tea.Program {
 	// Get terminal size
 	// TODO: width will be used in future updates, default to 80
 	_, height, err := term.GetSize(os.Stdout.Fd())
 	if err != nil || height <= 0 {
 		height = 24 // Default terminal size
 	}
+	fakeInfoService.SetProcessCount(height)
 	m := model{
-		futuresService: futuresService,
-		fakeInfo:       []string{},
+		futuresService:  futuresService,
+		fakeInfoService: fakeInfoService,
+		fakeInfo:        []string{},
 		futures: fmt.Sprintf("[%s] %-21s | %-21s ",
 			time.Now().Format("01/02 15:04:05"),
 			"-",
