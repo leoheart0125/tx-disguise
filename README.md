@@ -12,15 +12,20 @@ A terminal-based tool for disguising trading activity by displaying fake system 
 
 ## Usage
 
+
 ```
-Usage: txd [-v] [-h] [ -y | -z ]
-    -v: show version  
+Usage: txd [-v] [-h] [ -y | -z ] [-f type]
+    -v: show version
     -h: show this help
 Symbol Options:
-    -y: 小台 (MXF)  
+    -y: 小台 (MXF)
     -z: 微台 (TMF)
-Example: 
-    ./txd -y
+Fake Info Options:
+    -f: fake info service type (top or pure)
+        Default is "pure" (fully fake system info)
+        "top" uses system's top command (Apple Silicon only)
+Example:
+    ./txd -y -f top
 ```
 
 - Download the release asset for your platform (e.g., `tx-disguise-vX.Y.Z-arm64.tar.gz`).
@@ -66,14 +71,17 @@ make lint
 ```
 This will auto-install `golangci-lint` if not present, then run formatting and lint checks.
 
+
 ## Project Structure
-- `cmd/tx-disguise/main.go` — Entry point
-- `internal/futures/` — Futures logic, API, and utils
-- `internal/tui/` — Terminal UI (Bubble Tea)
-- `config/config.yaml` — Config file (reserved for future use)
+- `cmd/tx-disguise/main.go` — Entry point, CLI flag handling, TUI startup
+- `internal/tui/teaui.go` — Terminal UI logic (Bubble Tea)
+- `internal/futures/` — TAIFEX API, contract logic, DTOs, utils
+- `internal/fakeinfo/` — Fake system/process info generation
+- `internal/shared/ringbuffer.go` — Price history ring buffer
+- `config/config.yaml` — Reserved for future config
 - `Makefile` — Dev and lint tasks
-- `.air.toml` — Air config for hot reload
 - `.github/workflows/release.yml` — Release automation
+- `.air.toml` — Air config for hot reload
 
 ## License
 MIT
