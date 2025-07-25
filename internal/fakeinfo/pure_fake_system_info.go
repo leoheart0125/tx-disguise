@@ -3,6 +3,8 @@ package fakeinfo
 import (
 	"fmt"
 	"math/rand"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -112,10 +114,14 @@ func (s *PureFakeSystemInfoService) generateFakeProcesses(count int) []FakeProce
 		processes[i] = FakeProcess{
 			PID:     rand.Intn(10000) + 1,
 			Command: strings.ToLower(gofakeit.AppName()),
-			CPU:     rand.Float64() * 30,
-			Memory:  rand.Intn(1000) + 100,
+			CPU:     CPUUsageGenerator(),
+			Memory:  MemoryUsageGenerator(),
 		}
 	}
+	// Sort processes by CPU usage in descending order
+	sort.Slice(processes, func(i, j int) bool {
+		return processes[i].CPU > processes[j].CPU
+	})
 	return processes
 }
 
@@ -129,7 +135,7 @@ func (s *PureFakeSystemInfoService) GetFakeInfo() ([]string, error) {
 		if len(cmd) > 20 {
 			cmd = cmd[:20]
 		}
-		fakeInfo = append(fakeInfo, fmt.Sprintf("%-6d %-22s %-21.1f %-21d", proc.PID, cmd, proc.CPU, proc.Memory))
+		fakeInfo = append(fakeInfo, fmt.Sprintf("%-6d %-22s %-21.1f %-21s", proc.PID, cmd, proc.CPU, strconv.Itoa(proc.Memory)+"K+"))
 	}
 
 	return fakeInfo, nil
