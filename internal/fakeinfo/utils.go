@@ -22,10 +22,10 @@ func MemoryUsageGenerator() int {
 	weight := rand.Float64()
 	switch {
 	case weight < 0.1:
-		return rand.Intn(1000) + 1000 // High memory usage between
+		return rand.Intn(1000) + 1000 // High memory usage between 1000 and 1999
 	case weight < 0.5:
-		return rand.Intn(500) + 100 // Moderate memory usage between 100 and
+		return rand.Intn(500) + 100 // Moderate memory usage between 100 and 599
 	default:
-		return rand.Intn(100) + 10 // Low memory usage between 10 and
+		return rand.Intn(100) + 100 // Low memory usage between 100 and 199
 	}
 }

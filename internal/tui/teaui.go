@@ -106,7 +106,7 @@ func (m model) View() string {
 		if len(m.fakeInfo) == 0 {
 			m.fakeInfo, _ = m.fakeInfoService.GetFakeInfo()
 		}
-		visibleTopLines := max(m.height-3, 0)
+		visibleTopLines := min(max(m.height-3, 0), len(m.fakeInfo))
 		fakeBlock := strings.Join(m.fakeInfo[:visibleTopLines], "\n")
 		priceLine := fmt.Sprintf("%s %-11s %-21s | %-21s \n%s", "date", "", "Futures", "Actuals", m.futures)
 		return fmt.Sprintf("%s\n%s\n[q] quit, [tab] switch", fakeBlock, priceLine)

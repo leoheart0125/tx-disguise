@@ -27,3 +27,7 @@ dev-tui:
 lint: $(GOLANGCI_LINT_BIN)
 	$(GOLANGCI_LINT_BIN) fmt
 	$(GOLANGCI_LINT_BIN) run --fix
+
+.PHONY: build
+build:
+	go build -o txd ./cmd/tx-disguise

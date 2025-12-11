@@ -41,19 +41,15 @@ func FuturesIsThisMonthSettled() bool {
 
 func FuturesCurrentContractCodeAt(now time.Time) string {
 	year, month, _ := now.Date()
-	deltaMonth := 0
 	isMonthSettled := FuturesIsThisMonthSettledAt(now)
-	if month == 12 {
-		if isMonthSettled {
-			year++
-			month = 1
-		}
-		return fmt.Sprintf("%c%d", month, year%10)
-	}
 	if isMonthSettled {
-		deltaMonth = 1
+		month++
+		if month > 12 {
+			month = 1
+			year++
+		}
 	}
-	monthHex := 64 + int(month) + deltaMonth
+	monthHex := 64 + int(month)
 	return fmt.Sprintf("%c%d", monthHex, year%10)
 }
 

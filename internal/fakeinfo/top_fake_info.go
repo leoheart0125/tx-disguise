@@ -12,7 +12,8 @@ type TopFakeInfoService struct {
 
 func NewTopFakeInfoService(command string) *TopFakeInfoService {
 	return &TopFakeInfoService{
-		command: []string{"top", "-stats", "pid,command,cpu,mem", "-l", "2", "-n", "50", "-o", "cpu"},
+		command:      []string{"top", "-stats", "pid,command,cpu,mem", "-l", "2", "-n", "50", "-o", "cpu"},
+		processCount: 24, // default
 	}
 }
 
@@ -39,7 +40,11 @@ func (s *TopFakeInfoService) GetFakeInfo() ([]string, error) {
 				headerIdx = i
 				continue
 			} else {
-				return lines[i:s.processCount], nil
+				end := i + s.processCount
+				if end > len(lines) {
+					end = len(lines)
+				}
+				return lines[i:end], nil
 			}
 		}
 	}
