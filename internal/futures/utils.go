@@ -22,6 +22,18 @@ func ParseInt(s string) int {
 	return v
 }
 
+func ParseFloat(s string) float64 {
+	if s == "" {
+		return 0
+	}
+	v, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return 0
+	}
+	return v
+}
+
+
 func FuturesIsThisMonthSettledAt(now time.Time) bool {
 	year, month, day := now.Date()
 	nowMinutes := now.Hour()*60 + now.Minute()

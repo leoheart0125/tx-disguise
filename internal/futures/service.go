@@ -10,8 +10,8 @@ import (
 )
 
 type IService interface {
-	GetCurrentFuturesPrice() string
-	GetCurrentActualPrice() string
+	GetCurrentFuturesPrice() (string, float64)
+	GetCurrentActualPrice() (string, float64)
 }
 
 type Service struct {
@@ -56,7 +56,7 @@ func (s *Service) apiRequest(symbolID string) (*Quote, error) {
 	return &data.RtData, nil
 }
 
-func (s *Service) GetCurrentFuturesPrice() string {
+func (s *Service) GetCurrentFuturesPrice() (string, float64) {
 	session := MarketSessionNow()
 	var symbolID string
 	contractCode := FuturesCurrentContractCode()
@@ -70,19 +70,19 @@ func (s *Service) GetCurrentFuturesPrice() string {
 		symbolID = ""
 	}
 	if symbolID == "" {
-		return "-"
+		return "-", 0
 	}
 	q, err := s.apiRequest(symbolID)
 	if err != nil {
-		return "-"
+		return "-", 0
 	}
-	return ParseQuote(q)
+	return ParseQuote(q), ParseFloat(q.Quote.CLastPrice)
 }
 
-func (s *Service) GetCurrentActualPrice() string {
+func (s *Service) GetCurrentActualPrice() (string, float64) {
 	q, err := s.apiRequest(s.ActualsCode)
 	if err != nil {
-		return "-"
+		return "-", 0
 	}
-	return ParseQuote(q)
+	return ParseQuote(q), ParseFloat(q.Quote.CLastPrice)
 }

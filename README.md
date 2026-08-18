@@ -40,17 +40,18 @@ Example:
 
 ### Terminal UI Usage
 
-When you run `txd`, you'll see a terminal interface with two main views:
+When you run `txd`, you'll see a terminal interface with three main views:
 
 - **System Info View**: Displays fake system process info (from `top`) and current futures/actuals prices.
 - **History View**: Shows a scrollable history of futures/actuals prices over the past hour.
+- **Chart View**: Displays real-time line charts of futures and actuals price trends (updated every minute).
 
 **Controls:**
 - `[q]` Quit the program
-- `[tab]` Switch between System Info and History views
+- `[tab]` Switch between System Info, History and Chart views
 - `[up/down]` Scroll through history (in History view)
 
-The UI updates system info every 0.5 seconds, futures prices every 2 seconds, and appends to history every minute.
+The UI updates system info every 0.5 seconds, futures prices every 2 seconds, appends to history every minute, and updates the chart every minute.
 
 ## Development
 
